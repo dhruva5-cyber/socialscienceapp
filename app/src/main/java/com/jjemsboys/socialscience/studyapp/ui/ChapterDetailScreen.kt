@@ -127,25 +127,24 @@ fun ChapterDetailScreen(nav: NavController, id: String) {
             ) {
                 item {
                     OutlinedTextField(
-                        value = query,
-                        onValueChange = { query = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Search notes...") },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Search,
-                                contentDescription = null,
-                                tint = Color(0xFF0F7A6F) // DARK GREEN
-                            )
-                        },
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-    focusedBorderColor = Color(0xFF0F7A6F),
-    unfocusedBorderColor = Color(0xFF0F7A6F).copy(alpha = 0.5f)
-),
-),
-                        shape = RoundedCornerShape(12.dp)
-                    )
+    value = query,
+    onValueChange = { query = it },
+    modifier = Modifier.fillMaxWidth(),
+    placeholder = { Text("Search notes...") },
+    leadingIcon = {
+        Icon(
+            Icons.Default.Search,
+            contentDescription = null,
+            tint = Color(0xFF0F7A6F)
+        )
+    },
+    singleLine = true,
+    colors = OutlinedTextFieldDefaults.colors(
+        focusedBorderColor = Color(0xFF0F7A6F),
+        unfocusedBorderColor = Color(0xFF0F7A6F).copy(alpha = 0.5f)
+    ),
+    shape = RoundedCornerShape(12.dp)
+)
                 }
                 item {
                     Card(
