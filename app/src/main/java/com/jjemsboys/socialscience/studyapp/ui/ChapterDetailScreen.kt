@@ -139,9 +139,10 @@ fun ChapterDetailScreen(nav: NavController, id: String) {
                             )
                         },
                         singleLine = true,
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                        colors = OutlinedTextFieldDefaults.colors(
     focusedBorderColor = Color(0xFF0F7A6F),
-    unfocusedBorderColor = Color(0xFF0F7A6F).copy(0.5f)
+    unfocusedBorderColor = Color(0xFF0F7A6F).copy(alpha = 0.5f)
+),
 ),
                         shape = RoundedCornerShape(12.dp)
                     )
