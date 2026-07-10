@@ -1,0 +1,80 @@
+name: Build Signed Release APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make Gradle executable
+        run: chmod +x gradlew
+
+      # Generate a debug keystore
+      - name: Generate Debug Keystore
+        run: |
+          mkdir -p ~/.android
+          keytool -genkeypair \
+            -v \
+            -storetype PKCS12 \
+            -keystore ~/.android/debug.keystore \
+            -storepass android \
+            -alias androiddebugkey \
+            -keypass android \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+
+      # Build unsigned release
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+
+      # Sign release APK with debug keystore
+      - name: Sign APK
+        run: |
+          ZIPALIGN=$(find $ANDROID_HOME/build-tools -name zipalign | sort | tail -1)
+          APKSIGNER=$(find $ANDROID_HOME/build-tools -name apksigner | sort | tail -1)
+
+          mkdir signed
+
+          $ZIPALIGN -f -p 4 \
+          app/build/outputs/apk/release/app-release-unsigned.apk \
+          signed/app-release-aligned.apk
+
+          $APKSIGNER sign \
+            --ks ~/.android/debug.keystore \
+            --ks-pass pass:android \
+            --key-pass pass:android \
+            --ks-key-alias androiddebugkey \
+            --out signed/app-release.apk \
+            signed/app-release-aligned.apk
+
+      - name: Verify Signature
+        run: |
+          APKSIGNER=$(find $ANDROID_HOME/build-tools -name apksigner | sort | tail -1)
+          $APKSIGNER verify signed/app-release.apk
+
+      - name: Upload Signed APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: signed-release-apk
+          path: signed/app-release.apk
